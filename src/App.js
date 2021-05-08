@@ -6,25 +6,41 @@ import Shop from './pages/shop/Shop';
 import Header from './components/header/Header'
 import './App.css';
 import signInAndSignUp from './pages/signInAndSignUpPage/signInAndSignUp';
+import { auth } from './firebase/firebase.util';
 
-function App() {
-  const HatsPage = () => {
-    return (
-      <div>
-        <h1>Hats Page</h1>
-      </div>
-    )
+class App extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      currentUser: null
+    }
   }
-  return (
-    <div className="App">
-      <Header />
-      <Switch>
-        <Route exact path='/' component={HomePage} />
-        <Route path='/shop' component={Shop} />
-        <Route path='/signin' component={signInAndSignUp} />
-      </Switch>
-    </div>
-  );
+
+  unsubscribeFromAuth = null;
+
+  componentDidMount() {
+    auth.onAuthStateChanged(user => {
+      this.setState({ currentUser: user })
+    })
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeFromAuth();
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <Header currentUser={this.state.currentUser} />
+        <Switch>
+          <Route exact path='/' component={HomePage} />
+          <Route path='/shop' component={Shop} />
+          <Route path='/signin' component={signInAndSignUp} />
+        </Switch>
+      </div>
+    );
+  }
 }
 
 export default App;
